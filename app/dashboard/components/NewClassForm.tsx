@@ -11,11 +11,11 @@ const accentOptions = [
 
 export default function NewClassForm() {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+    <section className="rounded-2xl border border-(--color-app-border) bg-(--color-app-surface) p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-(--color-app-text)">
         Create a new class
       </h2>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-1 text-sm text-(--color-app-text-muted)">
         Organize your lessons by creating a class. You can add details now or
         update them later.
       </p>

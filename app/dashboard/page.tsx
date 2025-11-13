@@ -34,18 +34,18 @@ export default async function DashboardPage() {
   const classes = await getClasses(userId);
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-12 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100 sm:px-8">
+    <div className="min-h-screen bg-(--color-app-background) px-4 py-12 text-(--color-app-text) sm:px-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 lg:flex-row">
         <div className="w-full lg:max-w-sm">
           <div className="space-y-6">
             <header>
-              <p className="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm font-medium uppercase tracking-wide text-(--color-app-text-muted)">
                 Dashboard
               </p>
-              <h1 className="mt-2 text-3xl font-semibold text-zinc-900 dark:text-zinc-50">
+              <h1 className="mt-2 text-3xl font-semibold text-(--color-app-text)">
                 Your classes
               </h1>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="mt-2 text-sm text-(--color-app-text-muted)">
                 Review existing classes or set up a new space for your students.
               </p>
             </header>

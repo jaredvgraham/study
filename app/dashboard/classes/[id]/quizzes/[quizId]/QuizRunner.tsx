@@ -16,20 +16,35 @@ type QuizRunnerProps = {
 type AnswerState = {
   selected?: string;
   isCorrect?: boolean;
+  checked?: boolean;
 };
 
 export default function QuizRunner({ questions }: QuizRunnerProps) {
   const [answers, setAnswers] = useState<Record<number, AnswerState>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [checkAsYouGo, setCheckAsYouGo] = useState(false);
 
-  const score = useMemo(() => {
-    if (!submitted) {
-      return 0;
-    }
-    return questions.reduce((total, question, index) => {
+  const { interimScore, answeredCount, finalScore } = useMemo(() => {
+    let correct = 0;
+    let checkedCount = 0;
+
+    questions.forEach((question, index) => {
       const entry = answers[index];
-      return entry?.isCorrect ? total + 1 : total;
-    }, 0);
+      if (entry?.checked) {
+        checkedCount += 1;
+        if (entry.isCorrect) {
+          correct += 1;
+        }
+      }
+    });
+
+    const final = submitted ? correct : 0;
+
+    return {
+      interimScore: correct,
+      answeredCount: checkedCount,
+      finalScore: final,
+    };
   }, [answers, questions, submitted]);
 
   const handleSelect = (questionIndex: number, option: string) => {
@@ -38,6 +53,12 @@ export default function QuizRunner({ questions }: QuizRunnerProps) {
       ...prev,
       [questionIndex]: {
         selected: option,
+        ...(checkAsYouGo
+          ? {
+              isCorrect: option === questions[questionIndex].answer,
+              checked: true,
+            }
+          : {}),
       },
     }));
   };
@@ -53,6 +74,7 @@ export default function QuizRunner({ questions }: QuizRunnerProps) {
       evaluated[index] = {
         selected: selection,
         isCorrect: selection === question.answer,
+        checked: true,
       };
     });
 
@@ -65,26 +87,100 @@ export default function QuizRunner({ questions }: QuizRunnerProps) {
     setSubmitted(false);
   };
 
+  const toggleCheckMode = () => {
+    if (submitted) {
+      return;
+    }
+    setCheckAsYouGo((prevMode) => {
+      const nextMode = !prevMode;
+
+      setAnswers((prevAnswers) => {
+        const nextAnswers: Record<number, AnswerState> = {};
+
+        Object.keys(prevAnswers).forEach((key) => {
+          const index = Number(key);
+          const prevState = prevAnswers[index];
+          if (!prevState) {
+            return;
+          }
+
+          if (nextMode) {
+            if (prevState.selected === undefined) {
+              nextAnswers[index] = {
+                selected: prevState.selected,
+              };
+            } else {
+              nextAnswers[index] = {
+                selected: prevState.selected,
+                checked: true,
+                isCorrect: prevState.selected === questions[index].answer,
+              };
+            }
+          } else {
+            nextAnswers[index] = {
+              selected: prevState.selected,
+            };
+          }
+        });
+
+        return Object.keys(nextAnswers).length > 0
+          ? nextAnswers
+          : prevAnswers;
+      });
+
+      return nextMode;
+    });
+  };
+
   return (
     <div className="space-y-8">
-      <header className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <header className="flex flex-col gap-3 rounded-2xl border border-(--color-app-border) bg-(--color-app-surface) p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm font-medium uppercase tracking-wide text-(--color-app-text-muted)">
               Quiz progress
             </p>
-            <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <p className="text-lg font-semibold text-(--color-app-text)">
               {submitted
-                ? `Score: ${score} / ${questions.length}`
+                ? `Score: ${finalScore} / ${questions.length}`
+                : checkAsYouGo && answeredCount > 0
+                ? `${interimScore} of ${answeredCount} answered correctly`
                 : "Select an answer for each question and submit when ready"}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <button
               type="button"
+              onClick={toggleCheckMode}
+              disabled={submitted}
+              aria-pressed={checkAsYouGo}
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-app-accent) disabled:cursor-not-allowed disabled:opacity-60 ${
+                checkAsYouGo
+                  ? "border-emerald-400/80 bg-emerald-400/15 text-emerald-700 dark:text-emerald-300"
+                  : "border-(--color-app-border) text-(--color-app-text-muted) hover:border-(--color-app-accent) hover:text-(--color-app-text)"
+              }`}
+            >
+              <span
+                className={`relative inline-flex h-4 w-8 items-center rounded-full transition ${
+                  checkAsYouGo
+                    ? "bg-emerald-500/80"
+                    : "bg-zinc-300 dark:bg-zinc-700"
+                }`}
+                aria-hidden="true"
+              >
+                <span
+                  className={`absolute left-1 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-white transition ${
+                    checkAsYouGo ? "translate-x-4" : "translate-x-0"
+                  }`}
+                />
+              </span>
+              Check as you go
+            </button>
+            <button
+              type="button"
               onClick={handleSubmit}
               disabled={submitted}
-              className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400"
+              className="inline-flex items-center gap-2 rounded-full bg-(--color-app-accent) px-4 py-2 text-sm font-semibold text-(--color-app-accent-foreground) shadow-sm transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-app-accent) disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitted ? "Submitted" : "Submit answers"}
             </button>
@@ -92,7 +188,7 @@ export default function QuizRunner({ questions }: QuizRunnerProps) {
               <button
                 type="button"
                 onClick={resetQuiz}
-                className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-400 hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+                className="inline-flex items-center gap-2 rounded-full border border-(--color-app-border) px-4 py-2 text-sm font-semibold text-(--color-app-text) transition hover:border-(--color-app-accent) hover:text-(--color-app-text)"
               >
                 Try again
               </button>
@@ -106,22 +202,23 @@ export default function QuizRunner({ questions }: QuizRunnerProps) {
           const answerState = answers[index];
           const selected = answerState?.selected;
           const isCorrect = answerState?.isCorrect;
+          const isChecked = answerState?.checked || submitted;
 
           return (
             <li
               key={`${question.prompt}-${index}`}
-              className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition dark:border-zinc-800 dark:bg-zinc-900"
+              className="rounded-3xl border border-(--color-app-border) bg-(--color-app-surface) p-6 shadow-sm transition"
             >
               <div className="flex items-start justify-between gap-6">
                 <div>
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                  <p className="text-sm font-semibold text-(--color-app-text)">
                     {index + 1}. {question.prompt}
                   </p>
-                  <p className="mt-1 text-xs uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
+                  <p className="mt-1 text-xs uppercase tracking-wide text-(--color-app-text-muted)">
                     Choose one option
                   </p>
                 </div>
-                {submitted ? (
+                {isChecked ? (
                   <span
                     className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
                       isCorrect
@@ -134,12 +231,12 @@ export default function QuizRunner({ questions }: QuizRunnerProps) {
                 ) : null}
               </div>
 
-              <ul className="mt-4 space-y-2 text-sm text-zinc-700 dark:text-zinc-200">
+              <ul className="mt-4 space-y-2 text-sm text-(--color-app-text)">
                 {question.options.map((option, optionIndex) => {
                   const isSelected = selected === option;
                   const isAnswer = submitted && question.answer === option;
                   const showWrong =
-                    submitted && isSelected && question.answer !== option;
+                    isChecked && isSelected && question.answer !== option;
 
                   return (
                     <li key={`${option}-${optionIndex}`}>
@@ -147,10 +244,10 @@ export default function QuizRunner({ questions }: QuizRunnerProps) {
                         type="button"
                         onClick={() => handleSelect(index, option)}
                         disabled={submitted}
-                        className={`flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 disabled:cursor-not-allowed ${
+                        className={`flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-app-accent) disabled:cursor-not-allowed ${
                           isSelected
-                            ? "border-zinc-900 bg-zinc-900/5 text-zinc-900 dark:border-zinc-100 dark:bg-zinc-100/10 dark:text-zinc-100"
-                            : "border-zinc-200 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-500"
+                            ? "border-(--color-app-accent) bg-(--color-app-accent)/10 text-(--color-app-text)"
+                            : "border-(--color-app-border) hover:border-(--color-app-accent)"
                         } ${
                           submitted
                             ? isAnswer
@@ -158,10 +255,16 @@ export default function QuizRunner({ questions }: QuizRunnerProps) {
                               : showWrong
                               ? "border-rose-400 bg-rose-400/10 dark:border-rose-500 dark:bg-rose-500/10"
                               : ""
+                            : isChecked
+                            ? option === question.answer
+                              ? "border-emerald-400 bg-emerald-400/10 dark:border-emerald-500 dark:bg-emerald-500/10"
+                              : showWrong
+                              ? "border-rose-400 bg-rose-400/10 dark:border-rose-500 dark:bg-rose-500/10"
+                              : ""
                             : ""
                         }`}
                       >
-                        <span className="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full border border-zinc-300 text-xs font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">
+                        <span className="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full border border-(--color-app-border) text-xs font-medium text-(--color-app-text-muted)">
                           {String.fromCharCode(65 + optionIndex)}
                         </span>
                         <span>{option}</span>
@@ -171,8 +274,8 @@ export default function QuizRunner({ questions }: QuizRunnerProps) {
                 })}
               </ul>
 
-              {submitted ? (
-                <div className="mt-4 space-y-2 rounded-xl bg-zinc-100 p-4 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+              {isChecked ? (
+                <div className="mt-4 space-y-2 rounded-xl bg-(--color-app-surface-muted) p-4 text-sm text-(--color-app-text)">
                   <p>
                     <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                       Correct answer:
@@ -181,7 +284,7 @@ export default function QuizRunner({ questions }: QuizRunnerProps) {
                   </p>
                   {question.explanation ? (
                     <p>
-                      <span className="font-medium text-zinc-800 dark:text-zinc-100">
+                      <span className="font-medium text-(--color-app-text)">
                         Why:
                       </span>{" "}
                       {question.explanation}

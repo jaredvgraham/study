@@ -14,7 +14,7 @@ type QuizGeneratorFormProps = {
 function Spinner() {
   return (
     <span
-      className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white dark:border-emerald-900/50 dark:border-t-emerald-900"
+      className="h-4 w-4 animate-spin rounded-full border-2 border-app-accent-foreground/40 border-t-app-accent-foreground"
       aria-hidden="true"
     />
   );
@@ -27,7 +27,7 @@ function SubmitButton({ disabled = false }: { disabled?: boolean }) {
   return (
     <button
       type="submit"
-      className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400"
+      className="inline-flex items-center gap-2 rounded-full bg-(--color-app-accent) px-5 py-2 text-sm font-semibold text-(--color-app-accent-foreground) shadow-sm transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-app-accent) disabled:cursor-not-allowed disabled:opacity-60"
       disabled={isDisabled}
       aria-busy={pending}
     >
@@ -51,7 +51,7 @@ function StatusHint() {
   }
 
   return (
-    <p className="text-xs text-emerald-700 dark:text-emerald-300">
+    <p className="text-xs text-(--color-app-text-muted)">
       Crafting fresh questions. This usually takes a few seconds.
     </p>
   );
@@ -65,7 +65,7 @@ function QuizContextField({ disabled }: { disabled?: boolean }) {
     <div className="w-full space-y-2">
       <label
         htmlFor="quizContext"
-        className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+        className="block text-sm font-medium text-(--color-app-text)"
       >
         Quiz context *
       </label>
@@ -75,11 +75,11 @@ function QuizContextField({ disabled }: { disabled?: boolean }) {
         required
         rows={4}
         placeholder="Paste or summarize the specific material this quiz should cover. For example: Chapters 3-4 on cellular respiration, lab results, vocabulary list, etc."
-        className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-500 dark:focus:ring-zinc-800"
+        className="w-full rounded-xl border border-(--color-app-border) bg-(--color-app-surface) px-4 py-3 text-sm text-(--color-app-text) shadow-sm outline-none transition focus:border-(--color-app-accent) focus:ring-2 focus:ring-app-accent/30 disabled:cursor-not-allowed"
         disabled={isDisabled}
         aria-disabled={isDisabled}
       />
-      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+      <p className="text-xs text-(--color-app-text-muted)">
         We&apos;ll attach this to the class for future reference and reuse it
         when generating comprehensive exams.
       </p>
@@ -105,7 +105,7 @@ export default function QuizGeneratorForm({
         <SubmitButton disabled={disabled} />
         {disabled ? (
           disabledReason ? (
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs text-(--color-app-text-muted)">
               {disabledReason}
             </p>
           ) : null

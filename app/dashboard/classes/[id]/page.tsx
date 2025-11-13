@@ -68,26 +68,26 @@ export default async function ClassDetailPage({ params }: ClassPageProps) {
         : undefined,
     })) ?? [];
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-12 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100 sm:px-8">
+    <div className="min-h-screen bg-(--color-app-background) px-4 py-12 text-(--color-app-text) sm:px-8">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-        <div className="flex flex-col gap-4 rounded-3xl border border-zinc-200 bg-white p-10 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="flex flex-col gap-4 rounded-3xl border border-(--color-app-border) bg-(--color-app-surface) p-10 shadow-sm">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm font-medium uppercase tracking-wide text-(--color-app-text-muted)">
                 Class overview
               </p>
-              <h1 className="mt-2 text-3xl font-semibold text-zinc-900 dark:text-zinc-50">
+              <h1 className="mt-2 text-3xl font-semibold text-(--color-app-text)">
                 {classDoc.name}
               </h1>
               {classDoc.subject ? (
-                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                <p className="mt-1 text-sm text-(--color-app-text-muted)">
                   {classDoc.subject}
                 </p>
               ) : null}
             </div>
             {classDoc.accentColor ? (
               <span
-                className="h-12 w-12 rounded-full border border-zinc-200 shadow-inner dark:border-zinc-800"
+                className="h-12 w-12 rounded-full border border-(--color-app-border) shadow-inner"
                 style={{ backgroundColor: classDoc.accentColor }}
                 aria-hidden="true"
               />
@@ -95,17 +95,17 @@ export default async function ClassDetailPage({ params }: ClassPageProps) {
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-lg font-semibold text-(--color-app-text)">
               Description
             </h2>
-            <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            <p className="text-sm leading-6 text-(--color-app-text-muted)">
               {classDoc.description
                 ? classDoc.description
                 : "No description provided yet."}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-(--color-app-text-muted)">
             <span>
               Created{" "}
               {classDoc.createdAt
@@ -121,13 +121,13 @@ export default async function ClassDetailPage({ params }: ClassPageProps) {
           </div>
         </div>
 
-        <section className="rounded-3xl border border-zinc-200 bg-white p-10 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+        <section className="rounded-3xl border border-(--color-app-border) bg-(--color-app-surface) p-10 shadow-sm">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <h2 className="text-lg font-semibold text-(--color-app-text)">
                 Study quizzes
               </h2>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="text-sm text-(--color-app-text-muted)">
                 Generate focused quizzes by pasting the exact material you want
                 to assess. We&apos;ll archive each quiz context so you can build
                 cumulative exams later.
@@ -140,11 +140,11 @@ export default async function ClassDetailPage({ params }: ClassPageProps) {
           </div>
 
           {quizItems.length === 0 ? (
-            <div className="mt-8 rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-8 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
+            <div className="mt-8 rounded-2xl border border-dashed border-(--color-app-border) bg-(--color-app-surface-muted) p-8 text-center text-sm text-(--color-app-text-muted)">
               <p>
                 No quizzes yet. Paste the specific lesson or notes you want to
                 test and click
-                <span className="font-semibold text-zinc-800 dark:text-zinc-100">
+                <span className="font-semibold text-(--color-app-text)">
                   {" "}
                   Generate quiz
                 </span>{" "}
@@ -166,11 +166,11 @@ export default async function ClassDetailPage({ params }: ClassPageProps) {
                 ))}
               </ul>
               {storedQuizContexts.length > 0 ? (
-                <div className="space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-6 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-200">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                <div className="space-y-4 rounded-2xl border border-(--color-app-border) bg-(--color-app-surface-muted) p-6 text-sm text-(--color-app-text)">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-(--color-app-text-muted)">
                     Saved quiz contexts
                   </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="text-xs text-(--color-app-text-muted)">
                     Each context stays linked to its quiz and the class so you
                     can build cumulative assessments later.
                   </p>
@@ -178,26 +178,26 @@ export default async function ClassDetailPage({ params }: ClassPageProps) {
                     {storedQuizContexts.map((entry) => (
                       <li
                         key={`${entry.quizId}-${entry.createdAt ?? "context"}`}
-                        className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/60"
+                        className="rounded-xl border border-(--color-app-border) bg-(--color-app-surface) p-4 shadow-sm"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                          <p className="text-sm font-medium text-(--color-app-text)">
                             {entry.title}
                           </p>
                           {entry.createdAt ? (
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                            <span className="text-xs text-(--color-app-text-muted)">
                               Added {new Date(entry.createdAt).toLocaleString()}
                             </span>
                           ) : null}
                         </div>
-                        <p className="mt-2 line-clamp-4 whitespace-pre-line text-sm text-zinc-700 dark:text-zinc-200">
+                        <p className="mt-2 line-clamp-4 whitespace-pre-line text-sm text-(--color-app-text-muted)">
                           {entry.content}
                         </p>
                         {entry.quizId ? (
                           <div className="mt-3">
                             <Link
                               href={`/dashboard/classes/${classIdString}/quizzes/${entry.quizId}`}
-                              className="text-xs font-semibold text-emerald-600 transition hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
+                              className="text-xs font-semibold text-(--color-app-accent) transition hover:opacity-80"
                             >
                               Open quiz →
                             </Link>
